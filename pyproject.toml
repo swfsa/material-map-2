@@ -1,0 +1,30 @@
+[project]
+name = "poc3-1"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "ddgs>=9.14.4,<10",
+    "pandas>=3.0.5",
+    "pydantic>=2.13.4",
+    "pydantic-ai>=2.19.0",
+    "pymysql>=1.2.0",
+    "python-dotenv>=1.2.1",
+    "sqlalchemy>=2.0.51",
+    "sqlmodel>=0.0.39",
+    "tavily-python>=0.7.26,<0.8",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1,<10",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["mysql_demo2/tests"]
+addopts = "-ra -p no:cacheprovider"
+
+[[tool.uv.index]]
+url = "https://pypi.tuna.tsinghua.edu.cn/simple"
+default = true
