@@ -6,6 +6,9 @@ readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
     "ddgs>=9.14.4,<10",
+    "fastapi[standard]>=0.115,<1",
+    "networkx>=3.6.1",
+    "numpy>=2.5.1",
     "pandas>=3.0.5",
     "pydantic>=2.13.4",
     "pydantic-ai>=2.19.0",
@@ -13,6 +16,7 @@ dependencies = [
     "python-dotenv>=1.2.1",
     "sqlalchemy>=2.0.51",
     "sqlmodel>=0.0.39",
+    "statsmodels>=0.14.6",
     "tavily-python>=0.7.26,<0.8",
 ]
 
@@ -22,7 +26,7 @@ dev = [
 ]
 
 [tool.pytest.ini_options]
-testpaths = ["mysql_demo2/tests"]
+testpaths = ["poc3/tests"]
 addopts = "-ra -p no:cacheprovider"
 
 [[tool.uv.index]]
