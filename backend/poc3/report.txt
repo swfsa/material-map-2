@@ -1,0 +1,154 @@
+{
+  "title": "原油价格态势简报：地缘风险退潮后剧烈震荡",
+  "summary": "2026年6月至7月，WTI原油（库欣）经历\"暴跌—触底—反弹\"三阶段行情：6月初$96.87/桶高位断崖式下跌至7月初$70.48/桶低点（跌幅27.2%），随后在中旬反弹至$80.77/桶。核心驱动为美伊关系戏剧性转折：6 月18日《伊斯兰堡谅解备忘录》签署导致地缘溢价出清，7月7日美国取消伊朗售油豁免并发动军事打击后地缘溢价重新注入。霍尔木兹海峡\"开放—再封锁\"成为价格走势的主导变量。",
+  "key_findings": [
+    "6月5日至7月3日累计下跌$26.39（-27.2%），由美伊签署停战备忘录、霍尔木兹海峡恢复通航预期驱动",
+    "7月3日$70.48为阶段最低点，此后两周反弹$10.29至7月17日$80.77（+14.6%），受美国对伊朗发动军事打击及海峡再封锁刺激",
+    "6月单月WTI期货均价约$81.5/桶，环比下跌$16.4；布伦特均价$84.4/桶，环比下跌$19.3",
+    "OPEC+决定8月继续增产18.8万桶/天，但霍尔木兹海峡再度封锁使增产实际意义有限",
+    "全球需求端承压：EIA预计2026年全球石油需求下滑至102.9百万桶/天，中国5月原油进口同比暴跌29%至八年低点"
+  ],
+  "risks": [
+    "地缘政治尾部风险：美伊60天关键谈判期内，外交关系若出现边际逆转，地缘溢价可能阶段性再度飙升",
+    "霍尔木兹海峡通行不确定性：7月中旬海峡能源船只流量降至每日仅5只左右，若持续封锁将推升油价至$85以上",
+    "供需基本面偏空：OPEC+增产叠加全球需求疲软（中国进口锐减、IEA/EIA均预期供给增幅超需求），中期油价中枢承压",
+    "库存消耗风险：OECD商业原油库存已降至2003年以来最低水平，补库需求可能对价格形成阶段性支撑",
+    "多空博弈加剧：油价在$70-$85区间快速切换，短期波动率处于高位，需防范预测市场信号与实际走势的偏离"
+  ],
+  "suggestions": [
+    "短期紧盯霍尔木兹海峡通行流量变化，建议以每日能源船只通行数作为先行指标",
+    "关注美伊60天谈判窗口（截至8月中旬）的关键节点，任何边际变化都可能引发油价剧烈波动",
+    "密切跟踪7月下旬WTI能否守住$80关口，若跌破则可能回测$70-$72支撑区间",
+    "建议将布伦特$65-$85作为中期核心波动区间进行情景规划",
+    "关注OPEC+ 8月实际增产执行情况及沙特OSP定价策略对供需格局的边际影响"
+  ],
+  "data_window": {
+    "start": "2026-06-05T00:00:00",
+    "end": "2026-07-17T00:00:00",
+    "description": "内部数据覆盖2026年6月5日至7月17日，共7个周度数据点（WTI库欣现货价格）；外部证据检索覆盖2026年5月至7月公开报道与机构研报。"
+  },
+  "evidence": {
+    "internal": [
+      {
+        "source_type": "internal",
+        "title": "WTI Crude Oil Spot Price - Cushing, OK (2026-06-05)",
+        "source_name": "EIA",
+        "summary": "$96.87/桶，为数据窗口内最高价，反映伊朗战争期间霍尔木兹海峡封锁导致的供应恐慌溢价。",
+        "url": "https://api.eia.gov/v2/petroleum/pri/spt/data/",
+        "data_time": "2026-06-05T00:00:00",
+        "retrieved_at": "2026-07-24T15:26:02"
+      },
+      {
+        "source_type": "internal",
+        "title": "WTI Crude Oil Spot Price - Cushing, OK (2026-06-12)",
+        "source_name": "EIA",
+        "summary": "$92.16/桶，美伊和谈释放积极信号，地缘风险溢价开始松动。",
+        "url": "https://api.eia.gov/v2/petroleum/pri/spt/data/",
+        "data_time": "2026-06-12T00:00:00",
+        "retrieved_at": "2026-07-24T15:26:02"
+      },
+      {
+        "source_type": "internal",
+        "title": "WTI Crude Oil Spot Price - Cushing, OK (2026-06-19)",
+        "source_name": "EIA",
+        "summary": "$81.36/桶，6月18日美伊签署伊斯兰堡谅解备忘录后地缘溢价加速出清，单周暴跌$10.80。",
+        "url": "https://api.eia.gov/v2/petroleum/pri/spt/data/",
+        "data_time": "2026-06-19T00:00:00",
+        "retrieved_at": "2026-07-24T15:26:02"
+      },
+      {
+        "source_type": "internal",
+        "title": "WTI Crude Oil Spot Price - Cushing, OK (2026-06-26)",
+        "source_name": "EIA",
+        "summary": "$73.59/桶，油价继续回落至接近战前水平，市场消化海峡通航恢复预期。",
+        "url": "https://api.eia.gov/v2/petroleum/pri/spt/data/",
+        "data_time": "2026-06-26T00:00:00",
+        "retrieved_at": "2026-07-24T15:26:02"
+      },
+      {
+        "source_type": "internal",
+        "title": "WTI Crude Oil Spot Price - Cushing, OK (2026-07-03)",
+        "source_name": "EIA",
+        "summary": "$70.48/桶，数据窗口内最低点。沙特阿美下调8月OSP、OPEC+决定增产叠加需求疲软。",
+        "url": "https://api.eia.gov/v2/petroleum/pri/spt/data/",
+        "data_time": "2026-07-03T00:00:00",
+        "retrieved_at": "2026-07-24T15:26:02"
+      },
+      {
+        "source_type": "internal",
+        "title": "WTI Crude Oil Spot Price - Cushing, OK (2026-07-10)",
+        "source_name": "EIA",
+        "summary": "$72.26/桶，7月7日美国取消伊朗售油豁免并发动强力打击，地缘溢价重新注入，价格企稳回升。",
+        "url": "https://api.eia.gov/v2/petroleum/pri/spt/data/",
+        "data_time": "2026-07-10T00:00:00",
+        "retrieved_at": "2026-07-24T15:26:02"
+      },
+      {
+        "source_type": "internal",
+        "title": "WTI Crude Oil Spot Price - Cushing, OK (2026-07-17)",
+        "source_name": "EIA",
+        "summary": "$80.77/桶，伊朗宣布关闭霍尔木兹海峡后价格持续反弹，两周内回升$10.29。",
+        "url": "https://api.eia.gov/v2/petroleum/pri/spt/data/",
+        "data_time": "2026-07-17T00:00:00",
+        "retrieved_at": "2026-07-24T15:26:02"
+      }
+    ],
+    "external": [
+      {
+        "source_type": "external",
+        "title": "油气行业2026年6月月报",
+        "source_name": "国信证券/东方财富",
+        "summary": "6月布伦特期货均价$84.4/桶，环比跌$19.3；WTI期货均价$81.5/桶，环比跌$16.4。6月18日美伊签署伊斯兰堡谅解备忘录后WTI跌破$70。7月7日美国取消伊朗售油豁免后布伦特快速上涨至$85。霍尔木兹海 峡7月中旬能源船只流量降至每日5只。",
+        "url": "https://pdf.dfcfw.com/pdf/H3_AP202607171827060073_1.pdf",
+        "data_time": "2026-07-17T00:00:00",
+        "retrieved_at": "2026-08-02T07:34:38.427496Z"
+      },
+      {
+        "source_type": "external",
+        "title": "Oil prices fall, stocks rally as US, Iran sign framework to end war",
+        "source_name": "Al Jazeera",
+        "summary": "2026年6月18日，美伊签署和平框架协议（伊斯兰堡谅解备忘录），布伦特原油当日下跌2.3%。巴基斯坦总理谢里夫宣布备忘录即日生效。",
+        "url": "https://www.aljazeera.com/economy/2026/6/18/oil-prices-fall-stocks-rally-as-us-iran-sign-framework-to-end-war",
+        "data_time": "2026-06-18T00:00:00",
+        "retrieved_at": "2026-08-02T07:34:38.898208Z"
+      },
+      {
+        "source_type": "external",
+        "title": "Oil prices fall to seven-week low as Iran and Israel halt attacks",
+        "source_name": "Reuters",
+        "summary": "EIA预计2026年全球石油需求下滑至102.9百万桶/天；中国5月原油进口同比暴跌29%至八年最低。伊朗与以色列停止攻击后油价跌至七周低点。",
+        "url": "https://www.reuters.com/business/energy/oil-rises-slightly-investors-await-clarity-after-iran-israel-halt-attacks-2026-06-09",
+        "data_time": "2026-06-09T00:00:00",
+        "retrieved_at": "2026-08-02T07:34:38.898208Z"
+      },
+      {
+        "source_type": "external",
+        "title": "Oil Prices Return to Prewar Levels, Four Months Later",
+        "source_name": "New York Times",
+        "summary": "油价在伊朗战争初期飙升至$118/桶，随后因停火谈判与海峡重开预期回落。6月26日布伦特跌破$72，标志性回归战前水平。约20%全球石油供应流经霍尔木兹海峡。",
+        "url": "https://www.nytimes.com/2026/06/26/business/energy-environment/iran-war-oil-prices.html",
+        "data_time": "2026-06-26T00:00:00",
+        "retrieved_at": "2026-08-02T07:34:38.898208Z"
+      },
+      {
+        "source_type": "external",
+        "title": "Oil Prices Rise as Uncertainty Around Red Sea Grows",
+        "source_name": "Federal News Network / Kalshi",
+        "summary": "伊朗以关闭红海航线作为对美国打击伊朗电力设施的威胁。6月经由该海峡的石油约占全球产量的7%。预测市场对7月底布伦特是否突破$80存在分歧。",
+        "url": "https://federalnewsnetwork.com/prediction-markets/2026/07/oil-prices-rise-uncertainty-red-sea-grows-trade-prediction-markets-july-oil-prices",
+        "data_time": "2026-07-01T00:00:00",
+        "retrieved_at": "2026-08-02T07:34:38.898208Z"
+      },
+      {
+        "source_type": "external",
+        "title": "地缘局势预期降温：原油价格重回冲突初期水平（CME周报）",
+        "source_name": "CME Group / 金联创",
+        "summary": "OPEC将2026年全球石油需求增长预期从117万桶/天下调至97万桶/天。美伊备忘录签署后地缘危机降温是油价回落主因，但中东原油供应实际恢复和海峡航运重建仍需时日。后续60天关键谈判期内存在尾部风险。",
+        "url": "https://www.cmegroup.com/cn-s/insights/media-partners/jlc/crude-oil-weekly-report-2026-06-18.html",
+        "data_time": "2026-06-18T00:00:00",
+        "retrieved_at": "2026-08-02T07:34:38.427496Z"
+      }
+    ]
+  },
+  "conflicts": []
+}
