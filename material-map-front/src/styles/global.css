@@ -1,0 +1,71 @@
+html, body {
+  background: #060c24;
+}
+
+:root {
+  --bg-primary: rgba(10, 14, 39, 0.15);
+  --bg-panel: rgba(6, 12, 36, 0.22);
+  --border-color: rgba(0, 180, 255, 0.2);
+  --text-primary: #d0e8ff;
+  --text-accent: #00e5ff;
+  --text-warning: #ffab40;
+  --text-danger: #ff5252;
+}
+
+#app {
+  width: 100vw;
+  height: 100vh;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 面板通用样式 */
+.panel {
+  background: var(--bg-panel);
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+}
+.panel::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0, 200, 255, 0.6), transparent);
+}
+.panel-title {
+  font-size: 15px;
+  color: var(--text-accent);
+  padding: 8px 16px 4px;
+  letter-spacing: 2px;
+  white-space: nowrap;
+  text-shadow: 0 0 10px rgba(0, 229, 255, 0.4);
+}
+
+/* 加载动画 */
+.loading-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 14, 39, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+}
+.loading-spinner {
+  width: 24px;
+  height: 24px;
+  border: 2px solid rgba(0, 180, 255, 0.2);
+  border-top-color: #00e5ff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* 滚动条 */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(0, 180, 255, 0.2); border-radius: 2px; }

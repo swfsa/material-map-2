@@ -1,6 +1,6 @@
 from collections.abc import Generator
 from concurrent.futures import ThreadPoolExecutor
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from threading import Lock
 
 import pytest
@@ -9,6 +9,7 @@ from sqlalchemy.pool import StaticPool
 from sqlmodel import SQLModel, Session, create_engine
 
 from poc3.models import MaterialRecord
+from poc3.energy_registry import get_energy_indicator
 from poc3.repository import (
     MaterialRepository,
     SessionPerQueryMaterialRepository,
@@ -93,6 +94,56 @@ def test_rejects_invalid_limit(sqlite_engine: Engine) -> None:
         repository = MaterialRepository(session)
         with pytest.raises(ValueError, match="limit"):
             repository.query_material("crude_oil", limit=0)
+
+
+def test_energy_series_query_uses_exact_profile_and_has_no_agent_limit() -> None:
+    engine = create_engine(
+        "sqlite://",
+        connect_args={"check_same_thread": False},
+        poolclass=StaticPool,
+    )
+    SQLModel.metadata.create_all(engine)
+    profile = get_energy_indicator("wti_spot")
+    with Session(engine) as session:
+        session.add_all(
+            [
+                MaterialRecord(
+                    record_id=f"wti-{index}",
+                    category="energy",
+                    sub_category="crude_oil",
+                    region="US-OK-CUSHING",
+                    metric_type="price",
+                    value=70.0 + index,
+                    unit="USD/barrel",
+                    period=datetime(2026, 1, 1) + timedelta(days=index),
+                    source="eia",
+                    raw_metadata={"series": "RWTC"},
+                )
+                for index in range(120)
+            ]
+        )
+        session.add(
+            MaterialRecord(
+                record_id="wrong-series",
+                category="energy",
+                sub_category="crude_oil",
+                region="US-OK-CUSHING",
+                metric_type="price",
+                value=99.0,
+                unit="USD/barrel",
+                period=datetime(2026, 6, 1),
+                source="eia",
+                raw_metadata={"series": "NOT_RWTC"},
+            )
+        )
+        session.commit()
+
+        records = MaterialRepository(session).query_energy_series(profile)
+
+    assert len(records) == 120
+    assert records[0].record_id == "wti-0"
+    assert records[-1].record_id == "wti-119"
+    engine.dispose()
 
 
 def test_session_per_query_repository_is_safe_for_concurrent_calls(

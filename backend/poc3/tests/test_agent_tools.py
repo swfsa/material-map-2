@@ -7,7 +7,7 @@ from pydantic_ai.models.test import TestModel
 
 from poc3.agent import agent
 from poc3.deps import AppDeps
-from poc3.report import ReportIR
+from poc3.report import EnergyNarrative
 from poc3.search_models import SearchResult
 
 
@@ -65,40 +65,21 @@ def test_offline_agent_calls_internal_and_external_tools() -> None:
         web_search_client=search_client,
     )
     output = {
-        "title": "Offline report",
         "summary": "Validated without network or a paid model.",
-        "key_findings": ["Internal and external tools were called."],
-        "risks": [],
-        "suggestions": ["Keep evidence URLs."],
-        "data_window": {
-            "start": "2026-07-17T00:00:00",
-            "end": "2026-07-20T00:00:00",
-            "description": "Internal observation and external publication window.",
-        },
-        "evidence": {
-            "internal": [
-                {
-                    "source_type": "internal",
-                    "title": "WTI record",
-                    "source_name": "eia",
-                    "summary": "WTI was 80.77 USD/barrel.",
-                    "url": "https://example.com/internal",
-                    "data_time": "2026-07-17T00:00:00",
-                    "retrieved_at": "2026-07-24T00:00:00",
-                }
-            ],
-            "external": [
-                {
-                    "source_type": "external",
-                    "title": "External oil report",
-                    "source_name": "example.org",
-                    "summary": "Supply risk summary.",
-                    "url": "https://example.org/oil",
-                    "data_time": "2026-07-20T00:00:00",
-                    "retrieved_at": "2026-07-29T00:00:00",
-                }
-            ],
-        },
+        "trend_commentary": "Internal and external tools were called.",
+        "risk_commentary": "No additional risk was asserted.",
+        "recommendations": ["Keep evidence URLs."],
+        "external_evidence": [
+            {
+                "source_type": "external",
+                "title": "External oil report",
+                "source_name": "example.org",
+                "summary": "Supply risk summary.",
+                "url": "https://example.org/oil",
+                "data_time": "2026-07-20T00:00:00",
+                "retrieved_at": "2026-07-29T00:00:00",
+            }
+        ],
         "conflicts": [],
     }
 
@@ -111,26 +92,20 @@ def test_offline_agent_calls_internal_and_external_tools() -> None:
         ),
     )
 
-    assert isinstance(result.output, ReportIR)
+    assert isinstance(result.output, EnergyNarrative)
     assert len(repository.calls) == 1
     assert len(search_client.calls) == 1
-    assert result.output.evidence.external[0].url == "https://example.org/oil"
+    assert result.output.external_evidence[0].url == "https://example.org/oil"
 
 
 def test_agent_recovers_after_two_invalid_report_outputs() -> None:
     attempts = 0
     valid_output = {
-        "title": "Retry recovery report",
         "summary": "The third structured output is valid.",
-        "key_findings": ["Output validation retries are isolated from tool retries."],
-        "risks": [],
-        "suggestions": ["Keep the complete ReportIR contract."],
-        "data_window": {
-            "start": "2026-07-17T00:00:00",
-            "end": "2026-07-20T00:00:00",
-            "description": "Offline retry test window.",
-        },
-        "evidence": {"internal": [], "external": []},
+        "trend_commentary": "Output validation retries are isolated.",
+        "risk_commentary": "No new risk.",
+        "recommendations": ["Keep the complete narrative contract."],
+        "external_evidence": [],
         "conflicts": [],
     }
 
@@ -141,7 +116,7 @@ def test_agent_recovers_after_two_invalid_report_outputs() -> None:
         nonlocal attempts
         attempts += 1
         output_tool = agent_info.output_tools[0]
-        output = {"title": "Incomplete report"} if attempts < 3 else valid_output
+        output = {"summary": "Incomplete narrative"} if attempts < 3 else valid_output
         return ModelResponse(
             parts=[ToolCallPart(tool_name=output_tool.name, args=output)]
         )
@@ -157,4 +132,4 @@ def test_agent_recovers_after_two_invalid_report_outputs() -> None:
     )
 
     assert attempts == 3
-    assert result.output.title == "Retry recovery report"
+    assert result.output.summary == "The third structured output is valid."

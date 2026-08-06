@@ -25,7 +25,14 @@ def client() -> Iterator[TestClient]:
             [
                 _record("energy-2", "energy", datetime(2026, 1, 2), 82.0),
                 _record("weather-1", "weather", datetime(2026, 1, 1), 18.5),
-                _record("energy-1", "energy", datetime(2026, 1, 1), 80.0),
+                _record(
+                    "energy-1",
+                    "energy",
+                    datetime(2026, 1, 1),
+                    80.0,
+                    sub_category="crude_oil",
+                    source="eia",
+                ),
             ]
         )
         session.commit()
@@ -43,11 +50,19 @@ def client() -> Iterator[TestClient]:
         engine.dispose()
 
 
-def _record(record_id: str, category: str, period: datetime, value: float) -> MaterialRecord:
+def _record(
+    record_id: str,
+    category: str,
+    period: datetime,
+    value: float,
+    *,
+    sub_category: str | None = None,
+    source: str = "test-source",
+) -> MaterialRecord:
     return MaterialRecord(
         record_id=record_id,
         category=category,
-        sub_category=f"{category}_series",
+        sub_category=sub_category or f"{category}_series",
         region="test-region",
         metric_type="price",
         value=value,
@@ -56,7 +71,7 @@ def _record(record_id: str, category: str, period: datetime, value: float) -> Ma
         confidence="official_periodic",
         geo_scale="global",
         geo_ref={"scope": "test"},
-        source="test-source",
+        source=source,
         source_url="https://example.test/data",
         mom_change=None,
         yoy_change=None,
@@ -123,6 +138,22 @@ def test_returns_only_public_fields_in_chronological_order(client: TestClient) -
         "mom_change",
         "yoy_change",
     }
+
+
+def test_filters_specific_eia_sub_category_and_source(client: TestClient) -> None:
+    response = client.get(
+        "/api/records",
+        params={
+            "category": "energy",
+            "sub_category": "crude_oil",
+            "source": "eia",
+        },
+    )
+
+    assert response.status_code == 200
+    assert [(item["sub_category"], item["source"]) for item in response.json()] == [
+        ("crude_oil", "eia")
+    ]
 
 
 def test_rejects_reversed_period_range(client: TestClient) -> None:

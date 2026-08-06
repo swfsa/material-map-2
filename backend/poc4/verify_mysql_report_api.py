@@ -1,4 +1,4 @@
-"""Run GET /api/ReportIR against the configured MySQL database."""
+"""Run GET /api/reports/latest against the configured MySQL database."""
 
 from fastapi.testclient import TestClient
 
@@ -7,19 +7,16 @@ from poc4.main import app
 
 def main() -> None:
     with TestClient(app) as client:
-        response = client.get("/api/ReportIR")
+        response = client.get("/api/reports/latest")
         response.raise_for_status()
 
-    report = response.json()
-    evidence = report["evidence"]
-    print(f"GET /api/ReportIR status={response.status_code}")
-    print(f"title={report['title']}")
-    print(f"fields={','.join(report)}")
-    print(
-        "evidence="
-        f"internal:{len(evidence['internal'])},"
-        f"external:{len(evidence['external'])}"
-    )
+    payload = response.json()
+    blocks = payload["report_ir"]["blocks"]
+    print(f"GET /api/reports/latest status={response.status_code}")
+    print(f"generated_at={payload['generated_at']}")
+    print(f"blocks={len(blocks)}")
+    print(f"block_types={','.join(block['type'] for block in blocks)}")
+    print(f"html_chars={len(payload['html'])}")
 
 
 if __name__ == "__main__":

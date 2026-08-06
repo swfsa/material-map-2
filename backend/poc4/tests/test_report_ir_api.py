@@ -15,18 +15,16 @@ from poc4.main import app
 def _report(title: str) -> ReportIR:
     return ReportIR.model_validate(
         {
-            "title": title,
-            "summary": "完整摘要",
-            "key_findings": ["关键发现"],
-            "risks": ["风险"],
-            "suggestions": ["建议"],
-            "data_window": {
-                "start": "2026-06-05T00:00:00",
-                "end": "2026-07-17T00:00:00",
-                "description": "测试数据窗口",
-            },
-            "evidence": {"internal": [], "external": []},
-            "conflicts": [],
+            "blocks": [
+                {
+                    "type": "heading",
+                    "data": {"text": title, "level": 1},
+                },
+                {
+                    "type": "paragraph",
+                    "data": {"text": "完整摘要", "evidence_ids": []},
+                },
+            ]
         }
     )
 
@@ -53,7 +51,9 @@ def api() -> Iterator[tuple[TestClient, object]]:
         engine.dispose()
 
 
-def test_returns_latest_complete_report(api: tuple[TestClient, object]) -> None:
+def test_returns_latest_report_using_unified_contract(
+    api: tuple[TestClient, object],
+) -> None:
     client, engine = api
     with Session(engine) as session:
         older, _ = ReportRepository(session).save(_report("较早报告"))
@@ -62,31 +62,68 @@ def test_returns_latest_complete_report(api: tuple[TestClient, object]) -> None:
         newer.generated_at = datetime(2026, 8, 2, 8, 0, 0)
         session.commit()
 
-    response = client.get("/api/ReportIR")
+    response = client.get("/api/reports/latest")
 
     assert response.status_code == 200
     assert response.headers["content-type"].startswith("application/json")
-    assert response.headers["cache-control"] == "no-cache"
-    assert response.headers["x-accel-buffering"] == "no"
-    assert "content-length" not in response.headers
-    assert response.json() == _report("最新报告").model_dump(mode="json")
-    assert "id" not in response.json()
-    assert "content_sha256" not in response.json()
+    payload = response.json()
+    assert payload["report_ir"] == _report("最新报告").model_dump(mode="json")
+    assert payload["generated_at"] == "2026-08-02T08:00:00Z"
+    assert "<article" in payload["html"]
+    assert "最新报告" in payload["html"]
+    assert "id" not in payload
+    assert "content_sha256" not in payload
+
+
+def test_adapts_legacy_stored_report_to_blocks(api: tuple[TestClient, object]) -> None:
+    client, engine = api
+    legacy = {
+        "title": "旧版报告",
+        "summary": "旧版摘要",
+        "key_findings": [],
+        "risks": [],
+        "suggestions": [],
+        "data_window": {
+            "start": "2026-07-01T00:00:00",
+            "end": "2026-07-31T00:00:00",
+            "description": "旧版窗口",
+        },
+        "evidence": {"internal": [], "external": []},
+        "conflicts": [],
+    }
+    with Session(engine) as session:
+        from poc3.models import ReportIRRecord
+
+        session.add(
+            ReportIRRecord(
+                content_sha256="a" * 64,
+                title="旧版报告",
+                report_json=legacy,
+                generated_at=datetime(2026, 8, 3, 8, 0, 0),
+            )
+        )
+        session.commit()
+
+    response = client.get("/api/reports/latest")
+
+    assert response.status_code == 200
+    assert response.json()["report_ir"]["blocks"][0]["data"]["text"] == "旧版报告"
 
 
 def test_returns_404_when_no_report_exists(api: tuple[TestClient, object]) -> None:
     client, _ = api
 
-    response = client.get("/api/ReportIR")
+    response = client.get("/api/reports/latest")
 
     assert response.status_code == 404
-    assert response.json() == {"detail": "ReportIR not found"}
+    assert response.json() == {"detail": "Report not found"}
 
 
-def test_openapi_declares_report_ir_response() -> None:
+def test_openapi_declares_latest_report_response() -> None:
     schema = app.openapi()
-    response_schema = schema["paths"]["/api/ReportIR"]["get"]["responses"]["200"][
-        "content"
-    ]["application/json"]["schema"]
+    response_schema = schema["paths"]["/api/reports/latest"]["get"]["responses"][
+        "200"
+    ]["content"]["application/json"]["schema"]
 
-    assert response_schema["$ref"].endswith("/ReportIR")
+    assert response_schema["$ref"].endswith("/LatestReportResponse")
+    assert "/api/ReportIR" not in schema["paths"]

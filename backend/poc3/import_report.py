@@ -5,16 +5,24 @@ import json
 from pathlib import Path
 
 from .database import create_report_table, get_session
-from .report import ReportIR
+from .report import LegacyReportIR, validate_stored_report
 from .repository import ReportRepository
 
 
 def import_report(path: Path) -> tuple[int, bool]:
-    report = ReportIR.model_validate_json(path.read_text(encoding="utf-8-sig"))
+    payload = json.loads(path.read_text(encoding="utf-8-sig"))
+    if not isinstance(payload, dict):
+        raise ValueError("ReportIR 文件顶层必须是 JSON 对象")
+    report = validate_stored_report(payload)
+    legacy = LegacyReportIR.model_validate(payload) if "blocks" not in payload else None
     create_report_table()
 
     with get_session() as session:
-        row, created = ReportRepository(session).save(report)
+        row, created = ReportRepository(session).save(
+            report,
+            data_window_start=legacy.data_window.start if legacy else None,
+            data_window_end=legacy.data_window.end if legacy else None,
+        )
         session.commit()
         session.refresh(row)
         if row.id is None:

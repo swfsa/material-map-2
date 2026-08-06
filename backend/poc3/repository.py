@@ -7,8 +7,9 @@ from typing import Protocol
 from sqlmodel import Session, select
 
 from .domain import MATERIAL_CATEGORIES, MaterialCategory
+from .energy_registry import EnergyIndicatorProfile
 from .models import MaterialRecord, ReportIRRecord
-from .report import ReportIR
+from .report import ReportIR, report_title
 
 
 class MaterialQueryRepository(Protocol):
@@ -84,6 +85,43 @@ class MaterialRepository:
         #SQLModel 执行
         return self.session.exec(statement).all()
 
+    def query_energy_series(
+        self,
+        indicator: EnergyIndicatorProfile,
+        *,
+        start_date: date | None = None,
+        end_date: date | None = None,
+    ) -> list[MaterialRecord]:
+        """Return one exact EIA indicator without the Agent's 100-row limit."""
+
+        if start_date and end_date and start_date > end_date:
+            raise ValueError("start_date 不能晚于 end_date")
+        statement = select(MaterialRecord).where(
+            MaterialRecord.source == "eia",
+            MaterialRecord.category == indicator.category,
+            MaterialRecord.sub_category == indicator.sub_category,
+            MaterialRecord.region == indicator.region,
+            MaterialRecord.metric_type == indicator.metric_type,
+            MaterialRecord.unit == indicator.unit,
+        )
+        if start_date:
+            statement = statement.where(
+                MaterialRecord.period >= datetime.combine(start_date, time.min)
+            )
+        if end_date:
+            statement = statement.where(
+                MaterialRecord.period <= datetime.combine(end_date, time.max)
+            )
+        statement = statement.order_by(MaterialRecord.period.asc())
+        rows = list(self.session.exec(statement).all())
+        return [
+            row
+            for row in rows
+            if not row.raw_metadata
+            or not row.raw_metadata.get("series")
+            or row.raw_metadata.get("series") == indicator.series
+        ]
+
 
 class SessionPerQueryMaterialRepository:
     """
@@ -116,6 +154,27 @@ class SessionPerQueryMaterialRepository:
             )
 
 
+class SessionPerQueryEnergyRepository:
+    """Create and close a Session inside each complete-series query."""
+
+    def __init__(self, session_factory: Callable[[], Session]):
+        self._session_factory = session_factory
+
+    def query_energy_series(
+        self,
+        indicator: EnergyIndicatorProfile,
+        *,
+        start_date: date | None = None,
+        end_date: date | None = None,
+    ) -> list[MaterialRecord]:
+        with self._session_factory() as session:
+            return MaterialRepository(session).query_energy_series(
+                indicator,
+                start_date=start_date,
+                end_date=end_date,
+            )
+
+
 def report_content_sha256(report: ReportIR) -> str:
     """为同一份 ReportIR 生成稳定哈希，用于幂等导入。"""
 
@@ -134,7 +193,13 @@ class ReportRepository:
     def __init__(self, session: Session):
         self.session = session
 
-    def save(self, report: ReportIR) -> tuple[ReportIRRecord, bool]:
+    def save(
+        self,
+        report: ReportIR,
+        *,
+        data_window_start: datetime | None = None,
+        data_window_end: datetime | None = None,
+    ) -> tuple[ReportIRRecord, bool]:
         content_sha256 = report_content_sha256(report)
         existing = self.session.exec(
             select(ReportIRRecord).where(
@@ -146,9 +211,9 @@ class ReportRepository:
 
         row = ReportIRRecord(
             content_sha256=content_sha256,
-            title=report.title,
-            data_window_start=report.data_window.start,
-            data_window_end=report.data_window.end,
+            title=report_title(report),
+            data_window_start=data_window_start,
+            data_window_end=data_window_end,
             report_json=report.model_dump(mode="json"),
         )
         self.session.add(row)

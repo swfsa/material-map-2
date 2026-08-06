@@ -10,23 +10,21 @@ from poc3.repository import ReportRepository, report_content_sha256
 def _report(title: str = "测试报告") -> ReportIR:
     return ReportIR.model_validate(
         {
-            "title": title,
-            "summary": "摘要",
-            "key_findings": ["发现"],
-            "risks": ["风险"],
-            "suggestions": ["建议"],
-            "data_window": {
-                "start": "2026-06-01T00:00:00",
-                "end": "2026-07-01T00:00:00",
-                "description": "测试窗口",
-            },
-            "evidence": {"internal": [], "external": []},
-            "conflicts": [],
+            "blocks": [
+                {
+                    "type": "heading",
+                    "data": {"text": title, "level": 1},
+                },
+                {
+                    "type": "paragraph",
+                    "data": {"text": "摘要", "evidence_ids": []},
+                },
+            ]
         }
     )
 
 
-def test_save_report_is_idempotent() -> None:
+def test_save_report_is_idempotent_and_indexes_derived_fields() -> None:
     engine = create_engine(
         "sqlite://",
         connect_args={"check_same_thread": False},
@@ -37,7 +35,11 @@ def test_save_report_is_idempotent() -> None:
 
     try:
         with Session(engine) as session:
-            first, first_created = ReportRepository(session).save(report)
+            first, first_created = ReportRepository(session).save(
+                report,
+                data_window_start=datetime(2026, 6, 1),
+                data_window_end=datetime(2026, 7, 1),
+            )
             session.commit()
             second, second_created = ReportRepository(session).save(report)
 
@@ -45,7 +47,8 @@ def test_save_report_is_idempotent() -> None:
             assert second_created is False
             assert first.id == second.id
             assert first.content_sha256 == report_content_sha256(report)
-            assert first.report_json["title"] == "测试报告"
+            assert first.report_json["blocks"][0]["data"]["text"] == "测试报告"
+            assert first.title == "测试报告"
             assert first.data_window_start == datetime(2026, 6, 1)
     finally:
         engine.dispose()
